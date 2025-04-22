@@ -429,23 +429,47 @@ function fetchLeaderboard() {
 
 function openLeaderboard() {
   if (gameOverState) {
-    submitScoreAndShow(); // inserts & then calls fetchLeaderboard()
+    submitScoreAndShow(); // Inserts score & then calls fetchLeaderboard()
   } else {
     fetchLeaderboard();
   }
 }
 
 function closeLeaderboard() {
-  document.getElementById('leaderboardContainer').classList.add('hidden');
+  const leaderboard = document.getElementById('leaderboardContainer');
+  if (leaderboard) leaderboard.classList.add('hidden');
 }
 
 function fetchLeaderboard() {
   fetch('leaderboard.php')
-    .then(r => r.json())
+    .then(response => response.json())
     .then(data => {
-      // populate table...
-      document.getElementById('leaderboardContainer')
-              .classList.remove('hidden');
+      const tableBody = document.querySelector('#leaderboardTable tbody');
+      tableBody.innerHTML = '';
+
+      data.forEach((entry, index) => {
+        const row = document.createElement('tr');
+
+        // Highlight current player
+        if (entry.name === currentPlayerName) {
+          row.classList.add('highlight');
+        }
+
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${entry.name}</td>
+          <td>${entry.health}</td>
+          <td>${entry.highest_score}</td>
+          <td>${entry.waves_survived}</td>
+          <td>${entry.time_survived}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      document.getElementById('leaderboardContainer').classList.remove('hidden');
+    })
+    .catch(err => {
+      console.error('Error fetching leaderboard:', err);
     });
 }
 
