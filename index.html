@@ -470,12 +470,25 @@
     <div class="button-container">
       <button onclick="playAgain()">Play Again!</button>
       <button class="feedback-button" onclick="openFeedback()" title="Send us feedback">Feedback</button>
-      <!-- after the Feedback button: -->
-     <button id="viewLeaderboardGameOver" class="mode-button" onclick="openLeaderboard()">
+      <button id="viewLeaderboardGameOver" class="mode-button" onclick="openLeaderboard()">
      View Leaderboard
     </button>
     </div>
-  </div>
+
+   <!-- Leaderboard Container (inside Game Over) -->
+   <div id="leaderboardContainer" class="hidden" style="margin-top:20px; text-align:left;">
+   <h2>🏆 Leaderboard 🏆</h2>
+   <table id="leaderboardTable">
+   <thead>
+    <tr>
+    <th>#</th><th>Player</th><th>Health</th><th>Score</th><th>Waves</th><th>Time(s)</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+    </table>
+    <button onclick="closeLeaderboard()">Close</button>
+    </div>
+    </div>
   
   <!-- Game Canvas -->
   <canvas id="gameCanvas" width="1600" height="900"></canvas>
