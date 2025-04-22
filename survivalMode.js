@@ -1,6 +1,6 @@
 // survivalMode.js
 // ============================
-// CHAOS KEYBOARD BATTLE - SURVIVAL MODE (with Leaderboard integration)
+// CHAOS KEYBOARD BATTLE - SURVIVAL MODE
 // ============================
 
 let canvas, ctx;
@@ -80,6 +80,7 @@ function spawnPowerUp() {
   });
 }
 
+// Standard upward shot
 function shootBullet() {
   if (shootSound) {
     shootSound.currentTime = 0;
@@ -95,6 +96,7 @@ function shootBullet() {
   });
 }
 
+// Radial 360° shot (F key)
 function shoot360() {
   if (shootSound) {
     shootSound.currentTime = 0;
@@ -154,8 +156,128 @@ function update() {
   if (keys['e']) dash();
   if (player.dashCooldown > 0) player.dashCooldown -= 16;
 
-  // Update bullets/enemies/enemy bullets/power-ups (omitted for brevity)
-  // Drawing UI (omitted)
+  // Update bullets
+  player.bullets.forEach((b, i) => {
+    b.x += b.vx; b.y += b.vy;
+    if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+      player.bullets.splice(i, 1);
+    }
+  });
+
+  // Enemy logic
+  enemies.forEach((enemy, ei) => {
+    const dx = (player.x + player.width/2) - (enemy.x + enemy.width/2);
+    const dy = (player.y + player.height/2) - (enemy.y + enemy.height/2);
+    const dist = Math.hypot(dx, dy) || 1;
+    enemy.x += (dx/dist) * enemy.speed;
+    enemy.y += (dy/dist) * enemy.speed;
+
+    if (enemy.y > canvas.height) return enemies.splice(ei, 1);
+
+    if (Date.now() - enemy.lastShot > 2000) {
+      enemy.lastShot = Date.now();
+      const sx = enemy.x + enemy.width/2;
+      const sy = enemy.y + enemy.height/2;
+      const angle = Math.atan2((player.y + player.height/2) - sy, (player.x + player.width/2) - sx);
+      enemyBullets.push({
+        x: sx, y: sy, width: 10, height: 10,
+        vx: Math.cos(angle)*4, vy: Math.sin(angle)*4
+      });
+    }
+
+    // Collisions
+    if (isColliding(player, enemy)) {
+      if (!player.shieldActive) {
+        player.health -= 10;
+        if (hitSound) { hitSound.currentTime = 0; hitSound.play(); }
+      } else if (shieldBreakSound) {
+        shieldBreakSound.currentTime = 0; shieldBreakSound.play();
+      }
+      return enemies.splice(ei, 1);
+    }
+
+    player.bullets.forEach((b, bi) => {
+      if (isColliding(b, enemy)) {
+        enemy.health -= 20;
+        player.bullets.splice(bi, 1);
+        if (enemy.health <= 0) {
+          player.score += 10;
+          if (hitSound) { hitSound.currentTime = 0; hitSound.play(); }
+          enemies.splice(ei, 1);
+        }
+      }
+    });
+  });
+
+  // Enemy bullets
+  enemyBullets.forEach((b, i) => {
+    b.x += b.vx; b.y += b.vy;
+    if (b.y > canvas.height || b.x < 0 || b.x > canvas.width) {
+      enemyBullets.splice(i, 1);
+      return;
+    }
+    if (isColliding(b, player)) {
+      if (!player.shieldActive) {
+        player.health -= 10;
+        if (hitSound) { hitSound.currentTime = 0; hitSound.play(); }
+      } else if (shieldBreakSound) {
+        shieldBreakSound.currentTime = 0; shieldBreakSound.play();
+      }
+      enemyBullets.splice(i, 1);
+    }
+  });
+
+  // Power-ups
+  powerUps.forEach((pu, i) => {
+    if (Date.now() - pu.spawnTime > 5000) return powerUps.splice(i, 1);
+    if (isColliding(player, pu)) {
+      switch (pu.type) {
+        case 'health': player.health = Math.min(100, player.health + 20); break;
+        case 'shield': player.shieldActive = true; break;
+        case 'speed': player.speed += 2; break;
+        case 'bullet':
+          player.bullets.forEach(bl => {
+            bl.vx *= 1.5; bl.vy *= 1.5;
+          });
+          break;
+      }
+      powerUps.splice(i, 1);
+    }
+  });
+
+  // Draw power-ups
+  powerUps.forEach(pu => {
+    ctx.fillStyle = 'yellow';
+    ctx.fillRect(pu.x, pu.y, pu.width, pu.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '23px Arial';
+    ctx.fillText(pu.type, pu.x, pu.y - 5);
+    const tLeft = Math.ceil((5000 - (Date.now() - pu.spawnTime)) / 1000);
+    ctx.fillText(`(${tLeft})`, pu.x + pu.width - 12, pu.y + pu.height + 12);
+  });
+
+  // Draw player
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+  if (player.shieldActive) {
+    ctx.strokeStyle = 'cyan'; ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width, 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  // Draw bullets, enemies, enemy bullets
+  ctx.fillStyle = 'red'; player.bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+  ctx.fillStyle = 'green'; enemies.forEach(e => ctx.fillRect(e.x, e.y, e.width, e.height));
+  ctx.fillStyle = 'orange'; enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+
+  // UI
+  ctx.fillStyle = 'white'; ctx.font = '20px Arial';
+  ctx.fillText(`Health: ${player.health}`, 10, 30);
+  ctx.fillText(`Score: ${player.score}`, 10, 60);
+  ctx.fillText(`Wave: ${wave}`, 10, 90);
+  const elapsed = Math.floor((Date.now() - startTime - totalPausedTime)/1000);
+  ctx.fillText(`Time: ${elapsed}s`, 10, 120);
 
   if (player.health <= 0) return showLoseScreen();
   animationFrameId = requestAnimationFrame(update);
@@ -322,5 +444,3 @@ window.survivalStartGame = survivalStartGame;
 window.togglePause       = togglePause;
 window.restartGame       = restartGame;
 window.playAgain         = playAgain;
-window.openLeaderboard   = openLeaderboard;
-window.closeLeaderboard  = closeLeaderboard;
