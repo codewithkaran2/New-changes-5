@@ -383,7 +383,7 @@ function playAgain() {
 // Leaderboard integration
 function submitScoreAndShow() {
   const elapsed = Math.floor((Date.now() - startTime - totalPausedTime) / 1000);
-  fetch('insert_score.php', {
+  fetch('insertScore.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
