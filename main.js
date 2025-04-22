@@ -137,24 +137,61 @@ function startGame() {
 // -- Leaderboard Handling --  
 
 // Function to show leaderboard after game over  
-function showLeaderboard(playerName, playerScore, playerWaves, playerTime) {  
-  leaderboardContainer.style.display = "block";  // Show leaderboard container  
-  const leaderboard = getLeaderboard();  
-  leaderboard.push({ name: playerName, score: playerScore, waves: playerWaves, time: playerTime });  
-  leaderboard.sort((a, b) => b.score - a.score);  // Sort by score descending  
-  
-  const leaderboardHTML = leaderboard.slice(0, 10).map((entry, index) => {  
-    const isTopPlayer = entry.name === playerName;  
+function showLeaderboard(playerName, playerScore, playerWaves, playerTime, playerHealth) {
+  leaderboardContainer.style.display = "block";
+
+  const leaderboard = getLeaderboard();
+  leaderboard.push({
+    name: playerName,
+    score: playerScore,
+    waves: playerWaves,
+    time: playerTime,
+    health: playerHealth
+  });
+
+  leaderboard.sort((a, b) => b.score - a.score);  // Highest score first
+
+  const leaderboardHTML = leaderboard.slice(0, 10).map((entry, index) => {
+    const isTopPlayer = entry.name === playerName &&
+      entry.score === playerScore &&
+      entry.waves === playerWaves &&
+      entry.time === playerTime &&
+      entry.health === playerHealth;
+
     return `<div class="leaderboard-entry ${isTopPlayer ? 'top-player' : ''}">
-      <span>${index + 1}. ${entry.name} - Score: ${entry.score} - Waves: ${entry.waves} - Time: ${entry.time}</span>
-    </div>`;  
-  }).join("");  
-  
-  leaderboardContainer.innerHTML = leaderboardHTML;  
-  saveLeaderboard(leaderboard);  // Save updated leaderboard  
-  
-  viewLeaderboardButton.style.display = "block";  // Show 'View Leaderboard' button  
-}  
+      <span>${index + 1}. ${entry.name} - Score: ${entry.score} - Waves: ${entry.waves} - Time: ${entry.time} - Health: ${entry.health}%</span>
+    </div>`;
+  }).join("");
+
+  leaderboardContainer.innerHTML = leaderboardHTML;
+  saveLeaderboard(leaderboard);
+  viewLeaderboardButton.style.display = "block";
+}
+
+function getLeaderboard() {
+  const leaderboard = localStorage.getItem("leaderboard");
+  return leaderboard ? JSON.parse(leaderboard) : [];
+}
+
+function saveLeaderboard(leaderboard) {
+  localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+}
+
+viewLeaderboardButton.addEventListener("click", function () {
+  const leaderboard = getLeaderboard();
+
+  leaderboard.sort((a, b) => b.score - a.score);
+  leaderboardContainer.innerHTML = leaderboard.slice(0, 10).map((entry, index) => {
+    return `<div class="leaderboard-entry">
+      <span>${index + 1}. ${entry.name} - Score: ${entry.score} - Waves: ${entry.waves} - Time: ${entry.time} - Health: ${entry.health}%</span>
+    </div>`;
+  }).join("");
+
+  leaderboardContainer.style.display = "block";
+  viewLeaderboardButton.style.display = "none";
+}
+);
+
 
 // Retrieve leaderboard data from local storage (or other storage method)  
 function getLeaderboard() {  
