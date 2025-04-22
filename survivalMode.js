@@ -429,15 +429,26 @@ function fetchLeaderboard() {
 
 function openLeaderboard() {
   if (gameOverState) {
-    submitScoreAndShow();
+    submitScoreAndShow(); // inserts & then calls fetchLeaderboard()
   } else {
     fetchLeaderboard();
   }
 }
 
 function closeLeaderboard() {
-  document.getElementById('leaderboardScreen').classList.add('hidden');
+  document.getElementById('leaderboardContainer').classList.add('hidden');
 }
+
+function fetchLeaderboard() {
+  fetch('leaderboard.php')
+    .then(r => r.json())
+    .then(data => {
+      // populate table...
+      document.getElementById('leaderboardContainer')
+              .classList.remove('hidden');
+    });
+}
+
 
 // Expose to HTML
 window.survivalStartGame = survivalStartGame;
