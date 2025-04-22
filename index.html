@@ -396,6 +396,24 @@
       #volumeSlider { width: 80%; }
       #playerControls { flex-direction: column; align-items: center; }
     }
+    /* Leaderboard styling */
+    /* Highlight current player row */
+   #leaderboardTable tbody tr.highlight {
+   font-weight: bold;
+   box-shadow: 0 0 12px gold;
+   }
+   /* Table styling */
+   #leaderboardTable {
+   width: 90%;
+   max-width: 600px;
+   margin: 20px auto;
+   border-collapse: collapse;
+   }
+   #leaderboardTable th, #leaderboardTable td {
+   padding: 8px 12px;
+   border: 1px solid rgba(255,255,255,0.2);
+   }
+    
   </style>
 </head>
 <body>
