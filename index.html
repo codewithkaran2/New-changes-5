@@ -396,29 +396,42 @@
       #volumeSlider { width: 80%; }
       #playerControls { flex-direction: column; align-items: center; }
     }
-    /* Leaderboard styling */
-    /* Highlight current player row */
-   #leaderboardTable tbody tr.highlight {
-   font-weight: bold;
-   box-shadow: 0 0 12px gold;
-   }
-   /* Table styling */
-   #leaderboardTable {
-   width: 90%;
-   max-width: 600px;
-   margin: 20px auto;
-   border-collapse: collapse;
-   }
-   #leaderboardTable th, #leaderboardTable td {
-   padding: 8px 12px;
-   border: 1px solid rgba(255,255,255,0.2);
-   }
-   /* Ensure the leaderboard overlay pops above everything */
-   #leaderboardScreen {
-   z-index: 200;
-   }
 
-    
+    /* Leaderboard table styling */
+#leaderboardTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+#leaderboardTable th,
+#leaderboardTable td {
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Highlight current player row */
+#leaderboardTable tbody tr.highlight {
+  font-weight: bold;
+  box-shadow: 0 0 12px gold;
+}
+
+/* Hide/show the in‑overlay container */
+#leaderboardContainer.hidden {
+  display: none;
+}
+
+#leaderboardContainer {
+  display: block;
+  background: var(--overlay-bg);
+  padding: 16px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  margin: 20px auto 0;
+  text-align: left;
+}
+
   </style>
 </head>
 <body>
