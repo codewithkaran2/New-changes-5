@@ -480,7 +480,20 @@
       <button class="feedback-button" onclick="openFeedback()" title="Send us feedback">Feedback</button>
       <!-- after the Feedback button: -->
      <button id="viewLeaderboardGameOver" class="mode-button" onclick="openLeaderboard()">
-     View Leaderboard
+     View Leaderboard  
+  <!-- Leaderboard Overlay -->
+  <div id="leaderboardScreen" class="overlay hidden" role="dialog">
+  <h1>🏆 Leaderboard 🏆</h1>
+  <table id="leaderboardTable">
+  <thead>
+  <tr>
+  <th>#</th><th>Player</th><th>Health</th><th>Score</th><th>Waves</th><th>Time(s)</th>
+   </tr>
+  </thead>
+  <tbody></tbody>
+  </table>
+  <button onclick="closeLeaderboard()">Close</button>
+</div>
     </button>
     </div>
   </div>
