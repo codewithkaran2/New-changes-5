@@ -444,3 +444,9 @@ window.survivalStartGame = survivalStartGame;
 window.togglePause       = togglePause;
 window.restartGame       = restartGame;
 window.playAgain         = playAgain;
+
+// make these available to the HTML buttons
+window.submitScoreAndShow = submitScoreAndShow;
+window.fetchLeaderboard   = fetchLeaderboard;
+window.openLeaderboard    = openLeaderboard;
+window.closeLeaderboard   = closeLeaderboard;
